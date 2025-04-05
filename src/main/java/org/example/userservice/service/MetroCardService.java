@@ -4,6 +4,7 @@ import org.example.userservice.dto.request.BuyMetroCardRequest;
 import org.example.userservice.dto.response.MetroCardResponse;
 import org.example.userservice.exception.ActiveMetroCardExistsException;
 import org.example.userservice.exception.MetroCardNotFoundException;
+import org.example.userservice.exception.InsufficientBalanceException;
 import org.example.userservice.exception.UserNotFoundException;
 import org.example.userservice.model.MetroCard;
 import org.example.userservice.model.User;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -72,5 +74,23 @@ public class MetroCardService {
         metroCard.setActive(false);
         metroCardRepository.save(metroCard);
         return "MetroCard successfully deactivated : " + cardId;
+    }
+
+    @Transactional
+    public void deductFare(UUID cardId, BigDecimal amount) {
+        MetroCard metroCard = metroCardRepository.findById(cardId)
+                .orElseThrow(() -> new MetroCardNotFoundException("Metro card not found with id: " + cardId));
+
+        if (!metroCard.isActive()) {
+            throw new MetroCardNotFoundException("Metro card is not active for card id: " + cardId);
+        }
+
+        if (metroCard.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientBalanceException("Insufficient balance on metro card.");
+        }
+
+        // Deduct fare
+        metroCard.setBalance(metroCard.getBalance().subtract(amount));
+        metroCardRepository.save(metroCard);
     }
 }
