@@ -10,6 +10,4 @@ class UserServiceApplicationTests {
     void contextLoads() {
     }
 
-
-
 }

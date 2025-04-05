@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
@@ -50,5 +51,11 @@ public class MetroCardController {
     public ResponseEntity<String> deactivateMetroCard(@PathVariable UUID cardId) {
         String message = metroCardService.deactivateMetroCard(cardId.toString());
         return ResponseEntity.ok(message); // Returns a success message instead of 204 No Content
+    }
+
+    @PutMapping("/deduct")
+    public ResponseEntity<Void> deductFare(@RequestParam UUID cardId, @RequestParam BigDecimal amount) {
+        metroCardService.deductFare(cardId, amount);  // This should throw InsufficientBalanceException if not enough
+        return ResponseEntity.ok().build();
     }
 }
