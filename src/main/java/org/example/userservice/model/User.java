@@ -24,10 +24,7 @@ public class User {
     @Column(updatable = false, nullable = false)
     private UUID userId;
 
-
-    @NotBlank(message = "Name cannot be empty")
     @Column(nullable = false)
-    @Size(min = 2, max = 100)
     private String name;
 
     @Email(message = "Invalid email format")
