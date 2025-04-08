@@ -2,13 +2,17 @@ package org.example.userservice.service;
 
 import org.example.userservice.dto.request.UserRequest;
 import org.example.userservice.dto.response.UserResponse;
+import org.example.userservice.exception.TravelIdNotFoundException;
 import org.example.userservice.exception.UserNotFoundException;
+import org.example.userservice.model.TravelHistory;
 import org.example.userservice.model.User;
+import org.example.userservice.repository.TravelHistoryRepository;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -16,6 +20,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
 
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
@@ -96,4 +101,5 @@ public class UserService {
         userResponse.setDob(user.getDob());
         return userResponse;
     }
+
 }

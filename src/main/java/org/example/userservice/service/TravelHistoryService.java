@@ -5,6 +5,7 @@ import org.example.userservice.enums.TravelStatus;
 import org.example.userservice.exception.TravelIdNotFoundException;
 import org.example.userservice.model.TravelHistory;
 import org.example.userservice.repository.TravelHistoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,9 @@ import java.util.UUID;
 public class TravelHistoryService {
 
     private final TravelHistoryRepository repository;
+
+    @Autowired
+    private TravelHistoryRepository travelHistoryRepository;
 
     public TravelHistory createHistory(TravelHistoryRequest request) {
         TravelHistory travelHistory = TravelHistory.builder()
@@ -42,5 +46,20 @@ public class TravelHistoryService {
 
     public boolean doesTravelExist(UUID travelId) {
         return repository.existsByTravelId(travelId);
+    }
+
+    public void updatePenalty(UUID travelId, BigDecimal penaltyAmount) {
+        TravelHistory history = travelHistoryRepository.findByTravelId(travelId)
+                .orElseThrow(() -> new TravelIdNotFoundException("Travel history not found"));
+
+        history.setPenalty(penaltyAmount);
+        history.setTotalFare(history.getBaseFare().add(penaltyAmount));
+        travelHistoryRepository.save(history);
+    }
+
+    public BigDecimal getBaseFare(UUID travelId) {
+        TravelHistory history = repository.findByTravelId(travelId)
+                .orElseThrow(() -> new TravelIdNotFoundException("Travel ID not found"));
+        return history.getBaseFare();
     }
 }
