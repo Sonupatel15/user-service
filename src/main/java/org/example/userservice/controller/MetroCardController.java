@@ -1,61 +1,57 @@
 package org.example.userservice.controller;
 
+import jakarta.validation.Valid;
 import org.example.userservice.dto.request.BuyMetroCardRequest;
+import org.example.userservice.dto.request.TopUpRequest;
 import org.example.userservice.dto.response.MetroCardResponse;
 import org.example.userservice.service.MetroCardService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/metro-cards")
+@RequestMapping("/api/v1/metro-cards")
 public class MetroCardController {
 
-    @Autowired
-    private MetroCardService metroCardService;
+    private final MetroCardService metroCardService;
 
-    /**
-     * Buy a new metro card for a user
-     */
-    @PostMapping("/buy")
-    public ResponseEntity<MetroCardResponse> buyMetroCard(@RequestBody BuyMetroCardRequest request) {
-        MetroCardResponse response = metroCardService.buyMetroCard(request);
-        return ResponseEntity.ok(response);
+    public MetroCardController(MetroCardService metroCardService) {
+        this.metroCardService = metroCardService;
     }
 
-    /**
-     * Get metro card details by card ID
-     */
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public MetroCardResponse purchaseMetroCard(@Valid @RequestBody BuyMetroCardRequest request) {
+        return metroCardService.purchaseMetroCard(request);
+    }
+
     @GetMapping("/{cardId}")
-    public ResponseEntity<MetroCardResponse> getMetroCard(@PathVariable UUID cardId) {
-        MetroCardResponse response = metroCardService.getMetroCard(cardId.toString());
-        return ResponseEntity.ok(response);
+    public MetroCardResponse getMetroCard(@PathVariable UUID cardId) {
+        return metroCardService.getMetroCard(cardId);
     }
 
-    /**
-     * Get the active metro card of a user
-     */
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<MetroCardResponse> getMetroCardByUser(@PathVariable UUID userId) {
-        MetroCardResponse response = metroCardService.getMetroCardByUser(userId.toString());
-        return ResponseEntity.ok(response);
+    @GetMapping("/users/{userId}/active")
+    public MetroCardResponse getActiveUserMetroCard(@PathVariable UUID userId) {
+        return metroCardService.getActiveUserMetroCard(userId);
     }
 
-    /**
-     * Deactivate a metro card by card ID
-     */
-    @DeleteMapping("/deactivate/{cardId}")
-    public ResponseEntity<String> deactivateMetroCard(@PathVariable UUID cardId) {
-        String message = metroCardService.deactivateMetroCard(cardId.toString());
-        return ResponseEntity.ok(message); // Returns a success message instead of 204 No Content
+    @PatchMapping("/{cardId}/deactivate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deactivateMetroCard(@PathVariable UUID cardId) {
+        metroCardService.deactivateMetroCard(cardId);
     }
 
-    @PutMapping("/deduct")
-    public ResponseEntity<Void> deductFare(@RequestParam UUID cardId, @RequestParam BigDecimal amount) {
-        metroCardService.deductFare(cardId, amount);  // This should throw InsufficientBalanceException if not enough
-        return ResponseEntity.ok().build();
+    @PostMapping("/{cardId}/top-up")
+    public MetroCardResponse topUpMetroCard(@PathVariable UUID cardId,
+                                            @Valid @RequestBody TopUpRequest request) {
+        return metroCardService.topUpMetroCard(cardId, request);
+    }
+
+    @PostMapping("/{cardId}/deduct")
+    public MetroCardResponse deductFare(@PathVariable UUID cardId,
+                                        @RequestParam BigDecimal amount) {
+        return metroCardService.deductFare(cardId, amount);
     }
 }
