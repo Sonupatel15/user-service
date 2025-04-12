@@ -160,79 +160,13 @@ The User Service is a core microservice in the metro transportation system that 
 
     ![Deduct Fare from Metro Card Balance Response](https://github.com/user-attachments/assets/660363b3-3b1d-4200-bb9e-5b8005a6ca2c)
 
+### Travel History Actions
 
+#### Validate Travel ID
 
+* **Method:** GET
+* **Endpoint:** /api/travel-history/exists/{travelId}
+* **Description:** Validates a travel ID
+* **Response:**
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    ![Validate Travel ID Response](https://github.com/user-attachments/assets/c8757e59-793f-4af1-8bc6-6aee07543bdb)
